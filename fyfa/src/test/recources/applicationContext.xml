@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+      http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
+	default-autowire="no">
+
+
+	<bean id="Fields" class="no.kommune.bergen.soa.fyfa.core.Fields">
+		<constructor-arg>
+			<map>
+				<entry key="table_Saksnr">
+					<bean class="no.kommune.bergen.soa.fyfa.core.Field">
+						<property name="id" value="table_Saksnr" />
+						<property name="fieldTypeId" value="String" />
+						<property name="label" value="Saksnr" />
+						<property name="maxLength" value="20" />
+						<property name="description" value="Saksnr fra BkSak. Saksnr, Journalnr og Kode er unik referanse for oa_dok_adr i BkSak" />
+					</bean>
+				</entry>
+			</map>
+		</constructor-arg>
+	</bean>
+
+	<bean id="context" class="no.kommune.bergen.soa.fyfa.sre.Context" />
+
+</beans>
+

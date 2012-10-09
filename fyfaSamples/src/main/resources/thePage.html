@@ -1,0 +1,78 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>${title}</title>
+
+<script language='JavaScript' src='/fyfaSamples/calendar.js'></script>
+
+<style type="text/css">
+BODY {
+  color: #000066;
+  background-color: #dddddd;
+  font-family: Helvetica, Verdana, Arial, sans-serif; 
+}
+h1 {
+	text-align: center;
+	color: #3e099d;
+	font-size:150%;
+	line-height:normal;
+	margin-bottom: 5px;
+	padding-top: 3px;
+	padding-right: 20px;
+	padding-bottom: 3px;
+	padding-left: 20px;
+}
+h2 {
+	text-align: left;
+	color: #3e099d;
+	font-size:125%;
+	line-height:normal;
+	margin-bottom: 5px;
+	padding-top: 3px;
+	padding-right: 20px;
+	padding-bottom: 3px;
+	padding-left: 20px;
+}
+table {
+	padding: 1;
+}
+th {
+	color: #ffffff;
+	background-color: #3e099d;
+	padding-bottom: 1px;
+	padding-top: 1px;
+	padding-left: 6px;
+	padding-right: 6px;
+}
+td {
+	padding-bottom: 1px;
+	padding-top: 1px;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+td.error {
+	color:red;
+}
+tr.odd { background-color: #e5e8e8; }
+tr.even { background-color: #ccccff; }
+</style>
+</head>
+<body>
+  <div style="height:150px;background-color:#dddddd";>
+	<h1>Fyfa Samples</h1>
+	<p>
+	Demo of Fyfa features in a simple progression.
+	Except for 'Links', all demo dialogs are realized through restful services.
+	They all follow a similar pattern:	
+	First, render html for an input form, then upon submit, parse input into a java object and finally render an html-table containing multiples of the java object.</li>
+	</p>
+  </div>
+  <div style="height:90%;width:150px;float:left; color: #000066; background-color: #dddddd; border-right: 1px solid #ffffff; border-left: 1px solid #666666; border-bottom: 1px solid #ffffff; border-top: 1px solid #999999; padding-bottom: 2px; padding-top: 2px; padding-left: 2px; padding-right: 2px;">
+	${menu}
+  </div>
+  <div style="height:90%;width:75%float:right;color: #000066; background-color: #dddddd; border-right: 1px solid #ffffff; border-left: 1px solid #666666; border-bottom: 1px solid #ffffff; border-top: 1px solid #999999; padding-bottom: 2px; padding-top: 2px; padding-left: 2px; padding-right: 2px;">
+	<h2> ${title}</h2>
+	${content}
+  </div>
+</body>
+</html>

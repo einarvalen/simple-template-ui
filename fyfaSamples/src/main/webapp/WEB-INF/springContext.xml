@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+	http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+	http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
+		<property name="velocityPropertiesMap">
+			<map>
+				<entry key="input.encoding" value="UTF-8" />
+				<entry key="resource.loader" value="classpath" />
+				<entry key="classpath.resource.loader.class" value="org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="renderingEngine" class="org.fyfa.samples.RenderingEngine">
+		<constructor-arg ref="velocityEngine" />
+	</bean>
+
+	<jaxrs:server id="restServer" address="/rest">
+		<jaxrs:serviceBeans>
+			<bean class="org.fyfa.samples.SimpleRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.AnnotationRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.SelectionRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.NlsRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.TemplateRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.FieldTypeRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.ValidatorRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.link.LinkRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
+			<bean class="org.fyfa.samples.SpringRest">
+				<constructor-arg index="0" ref="renderingEngine" />
+				<constructor-arg index="1" ref="context" />
+			</bean>
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+
+	<bean id="nls" class="org.fyfa.nls.NlsUs"/>
+	
+	<bean id="context" class="org.fyfa.Context">
+		<constructor-arg index="0" ref="nls" />
+		<property name="templateList">
+			<list>
+				<bean class="org.fyfa.Template">
+					<constructor-arg index="0">
+						<bean class="org.fyfa.ids.TemplateId">
+							<constructor-arg value="MyBreak"/>
+						</bean>
+					</constructor-arg>
+					<constructor-arg index="1">
+						<bean class="org.fyfa.ids.TemplateTypeId">
+							<constructor-arg value="TemplateTypeDefault"/>
+						</bean>
+					</constructor-arg>
+					<constructor-arg index="2" value="&lt;tr&gt;&lt;td colspan=2&gt;&lt;hr/&gt;&lt;/td&gt;&lt;/tr&gt;"/>
+				</bean>
+				<bean class="org.fyfa.Template">
+					<constructor-arg index="0">
+						<bean class="org.fyfa.ids.TemplateId">
+							<constructor-arg value="MyTextareaTemplateId"/>
+						</bean>
+					</constructor-arg>
+					<constructor-arg index="1">
+						<bean class="org.fyfa.ids.TemplateTypeId">
+							<constructor-arg value="TemplateTypeDefault"/>
+						</bean>
+					</constructor-arg>
+					<constructor-arg index="2" value="&lt;tr&gt;&lt;td colspan=2 &gt;&lt;label for='$ID$'&gt;$LABEL$(Addition)&lt;/label&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=2&gt;&lt;textarea name='$FIELD_ID$' title='$DESCRIPTION$' rows='2' cols='$MAXLENGTH$'&gt;$VALUE$&lt;/textarea&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=2 class='error'&gt;$HINT$&lt;/td&gt;&lt;/tr&gt;"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+</beans>
+
