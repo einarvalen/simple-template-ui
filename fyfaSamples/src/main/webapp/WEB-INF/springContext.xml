@@ -50,6 +50,9 @@
 			<bean class="org.fyfa.samples.link.LinkRest">
 				<constructor-arg ref="renderingEngine" />
 			</bean>
+			<bean class="org.fyfa.samples.dbcrud.CountryRest">
+				<constructor-arg ref="renderingEngine" />
+			</bean>
 			<bean class="org.fyfa.samples.SpringRest">
 				<constructor-arg index="0" ref="renderingEngine" />
 				<constructor-arg index="1" ref="context" />
