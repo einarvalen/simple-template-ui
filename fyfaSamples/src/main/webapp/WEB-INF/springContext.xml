@@ -10,6 +10,12 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+	<import resource="classpath:datasource.xml" />
+	
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
 	<bean id="velocityEngine" class="org.springframework.ui.velocity.VelocityEngineFactoryBean">
 		<property name="velocityPropertiesMap">
 			<map>
@@ -51,7 +57,8 @@
 				<constructor-arg ref="renderingEngine" />
 			</bean>
 			<bean class="org.fyfa.samples.dbcrud.CountryRest">
-				<constructor-arg ref="renderingEngine" />
+				<constructor-arg index="0" ref="renderingEngine" />
+				<constructor-arg index="1" ref="jdbcTemplate" />
 			</bean>
 			<bean class="org.fyfa.samples.SpringRest">
 				<constructor-arg index="0" ref="renderingEngine" />

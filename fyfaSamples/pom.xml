@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.fyfa</groupId>
-  <artifactId>fyfaSamples</artifactId>
-  <version>2.6-SNAPSHOT</version>
-  <packaging>war</packaging>
-  <name>fyfaSamples</name>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.fyfa</groupId>
+	<artifactId>fyfaSamples</artifactId>
+	<version>2.6-SNAPSHOT</version>
+	<packaging>war</packaging>
+	<name>fyfaSamples</name>
 	<description>Web project to demonstrate usage of the fyfa api.</description>
 	<properties>
 		<cxf.version>2.3.1</cxf.version>
@@ -14,8 +15,8 @@
 		<log4j.version>1.2.14</log4j.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-  <build>
-    <finalName>fyfaSamples</finalName>
+	<build>
+		<finalName>fyfaSamples</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -30,8 +31,8 @@
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>maven-jetty-plugin</artifactId>
- 				<version>6.1.10</version>
- 				<configuration>
+				<version>6.1.10</version>
+				<configuration>
 					<webAppConfig>
 						<contextPath>/fyfaSamples</contextPath>
 					</webAppConfig>
@@ -58,9 +59,9 @@
 					</archive>
 				</configuration>
 			</plugin>
-			</plugins>
-  </build>
-  <dependencies>
+		</plugins>
+	</build>
+	<dependencies>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -161,7 +162,18 @@
 			<artifactId>netezza</artifactId>
 			<version>3.5.0</version>
 		</dependency>
-		
-		
-  </dependencies>
+		<dependency>
+			<groupId>org.netezza.Driver</groupId>
+			<artifactId>netezza</artifactId>
+			<version>7.1</version>
+		</dependency>
+<!-- 
+		<dependency>
+			<groupId>hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.10</version>
+			<scope>test</scope>
+		</dependency>
+ -->
+	</dependencies>
 </project>

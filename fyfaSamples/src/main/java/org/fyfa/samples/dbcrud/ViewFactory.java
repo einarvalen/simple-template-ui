@@ -48,7 +48,7 @@ public class ViewFactory {
 	public Form<CountryDo> createFormForSearchFilter() {
 		FormParams<CountryDo> params = new FormParams<CountryDo>( "SearchCountry", CountryDo.class, this.context );
 		params.setOperation( Operation.Search );
-		params.setColumnNamesInSequence( new String[] { "COUNTRY_NAME", "COUNTRY_KEY" } );
+		params.setColumnNamesInSequence( new String[] { "COUNTRY_NAME", "CAPITAL" } );
 		params.setFormActionUri( this.pathSetting.getSearchUri() );
 		params.addButton( new SubmitButton( "Search", "Submit form to search for data" ) );
 		params.addButton( new Button( "Quit", "Quit this form", getQuitAction() ) );
@@ -85,5 +85,14 @@ public class ViewFactory {
 	private String getAction( String uri ) {
 		return String.format( "document.location=\"%s\"", uri );
 	}
+	
+	private String[] concat(String[] a, String[] b) {
+		   int aLen = a.length;
+		   int bLen = b.length;
+		   String[] c= new String[aLen+bLen];
+		   System.arraycopy(a, 0, c, 0, aLen);
+		   System.arraycopy(b, 0, c, aLen, bLen);
+		   return c;
+		}
 
 }

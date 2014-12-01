@@ -104,4 +104,27 @@ public class CountryDo {
 		EMERGING_MARKET = eMERGING_MARKET;
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CountryDo [COUNTRY_ID=");
+		builder.append(COUNTRY_ID);
+		builder.append(", COUNTRY_KEY=");
+		builder.append(COUNTRY_KEY);
+		builder.append(", COUNTRY_NAME=");
+		builder.append(COUNTRY_NAME);
+		builder.append(", CAPITAL=");
+		builder.append(CAPITAL);
+		builder.append(", EU=");
+		builder.append(EU);
+		builder.append(", SUBREGION_ID=");
+		builder.append(SUBREGION_ID);
+		builder.append(", LCC=");
+		builder.append(LCC);
+		builder.append(", EMERGING_MARKET=");
+		builder.append(EMERGING_MARKET);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

@@ -14,6 +14,7 @@ import org.fyfa.components.Form;
 import org.fyfa.components.ParseException;
 import org.fyfa.components.Table;
 import org.fyfa.samples.RenderingEngine;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /** Link is a CRUD show-case.
  *
@@ -32,7 +33,7 @@ public class CountryRest {
 	private static final String DeleteUri = "/delete/{COUNTRY_ID}";
 	private static final String BaseUri = "/fyfaSamples/service/rest/country";
 	private final Context context = new Context();
-	private final Dao dao = new Dao();
+	private final Dao dao;
 	private final ViewFactory viewFactory;
 	private final RenderingEngine renderingEngine;
 	private final Form<CountryDo> formModify;
@@ -41,8 +42,9 @@ public class CountryRest {
 	private final Form<CountryDo> formView;
 	private final Table<CountryDo> tableList;
 
-	public CountryRest( RenderingEngine renderingEngine ) {
+	public CountryRest( RenderingEngine renderingEngine, JdbcTemplate jdbcTemplate ) {
 		this.renderingEngine = renderingEngine;
+		this.dao = new Dao(jdbcTemplate);
 		viewFactory = new ViewFactory( this.context, newPathSetting() );
 		formModify = viewFactory.createFormForRowModifications();
 		formNew = viewFactory.createFormForAddingNewRows();
@@ -104,7 +106,7 @@ public class CountryRest {
 		CountryDo countryDo = null;
 		try {
 			countryDo = parse( formModify, multivaluedMap );
-			dao.put( countryDo );
+			dao.putExisting( countryDo );
 			return render( tableList, dao.find() );
 		} catch (ParseException e) {
 			return renderWithErrors( formModify, countryDo, e );
@@ -173,7 +175,7 @@ public class CountryRest {
 		CountryDo countryDo = null;
 		try {
 			countryDo = parse( formNew, multivaluedMap );
-			dao.put( countryDo );
+			dao.putNew( countryDo );
 			return render( formNew, new CountryDo() );
 		} catch (ParseException e) {
 			return renderWithErrors( formNew, countryDo, e );
