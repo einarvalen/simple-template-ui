@@ -60,6 +60,10 @@
 				<constructor-arg index="0" ref="renderingEngine" />
 				<constructor-arg index="1" ref="jdbcTemplate" />
 			</bean>
+			<bean class="org.fyfa.samples.dbcrud.Crap">
+				<constructor-arg index="0" ref="renderingEngine" />
+				<constructor-arg index="1" ref="jdbcTemplate" />
+			</bean>
 			<bean class="org.fyfa.samples.SpringRest">
 				<constructor-arg index="0" ref="renderingEngine" />
 				<constructor-arg index="1" ref="context" />

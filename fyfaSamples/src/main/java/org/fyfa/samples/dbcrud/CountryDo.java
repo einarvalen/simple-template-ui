@@ -31,14 +31,14 @@ public class CountryDo {
 	@FieldDef(label= "Emerging Market")
 	private int EMERGING_MARKET;
 
-	public CountryDo() {
-	}
-	
-	public CountryDo(String countryId, int countryKey, String countryName) {
-		this.COUNTRY_ID = countryId;
-		this.COUNTRY_KEY = countryKey;
-		this.COUNTRY_NAME = countryName;
-	}
+//	public CountryDo() {
+//	}
+//	
+//	public CountryDo(String countryId, int countryKey, String countryName) {
+//		this.COUNTRY_ID = countryId;
+//		this.COUNTRY_KEY = countryKey;
+//		this.COUNTRY_NAME = countryName;
+//	}
 
 	public String getCOUNTRY_ID() {
 		return COUNTRY_ID;

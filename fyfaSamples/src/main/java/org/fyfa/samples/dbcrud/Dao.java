@@ -14,134 +14,162 @@ import org.fyfa.Marshal;
  * 
  * @author EinarValen@gmail.com
  */
-public class Dao {
+abstract public class Dao<T> {
 	final static Logger logger = Logger.getLogger(Dao.class);
-	// SELECT
-	// COUNTRY_ID,COUNTRY_KEY,COUNTRY_NAME,CAPITAL,EU,SUBREGION_ID,LCC,EMERGING_MARKET
-	// FROM EMEA_ODS.ODS.REF_COUNTRY ORDER BY COUNTRY_NAME;
-	final String[] columnAry = {"COUNTRY_ID","COUNTRY_KEY","COUNTRY_NAME","CAPITAL,EU","SUBREGION_ID","LCC","EMERGING_MARKET"};
-	final String[] columnSearchAry = {"CAPITAL","COUNTRY_NAME"};
-	final String columnNames = "COUNTRY_ID,COUNTRY_KEY,COUNTRY_NAME,CAPITAL,EU,SUBREGION_ID,LCC,EMERGING_MARKET";
 	private final JdbcTemplate jdbcTemplate;
 	private final Marshal marshal = new Marshal();
 
-	public Dao(JdbcTemplate jdbcTemplate) {
+	private final String columnKey;
+	private final String[] columnsForRowModifications;
+	private final String[] columnsForAddingNewRows;
+	private final String[] columnsForSearchFilter;
+	private final String[] columnsForListView;
+	private final String tableName;
+	private final String databaseName;
+
+	public Dao(JdbcTemplate jdbcTemplate, DaoParams params) {
 		this.jdbcTemplate = jdbcTemplate;
+		this.columnKey = params.getColumnKey();
+		this.columnsForAddingNewRows = params.getColumnsForAddingNewRows();
+		this.columnsForRowModifications = params.getColumnsForRowModificationsDao();
+		this.columnsForSearchFilter = params.getColumnsForSearchFilter();
+		this.columnsForListView = params.getColumnsForListView();
+		this.tableName = params.getTableName();
+		this.databaseName = params.getDatabaseName();
 	}
 
-	public CountryDo get(String countryId) {
-		String sql = "SELECT " + columnNames
-				+ " FROM EMEA_ODS.ODS.REF_COUNTRY WHERE COUNTRY_ID=?";
-		Object[] args = new Object[] { countryId };
-		Map<String, Object> row = jdbcTemplate.queryForMap(sql, args);
-		return mapCountryDo(row);
+	private Object toCommaList(String[] columnNames) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String fieldName : columnNames) {
+			if (!first) sb.append(",");
+			sb.append(fieldName);
+			first = false;
+		}
+		return sb.toString();
 	}
 
-	private CountryDo mapCountryDo(Map<String, Object> map) {
-		if (map == null || map.size() == 0)
-			return null;
-		CountryDo countryDo = new CountryDo();
-		countryDo.setCAPITAL(getStringValue(map, "CAPITAL"));
-		countryDo.setCOUNTRY_ID(getStringValue(map, "COUNTRY_ID"));
-		countryDo.setCOUNTRY_KEY(getIntValue(map, "COUNTRY_KEY"));
-		countryDo.setCOUNTRY_NAME(getStringValue(map, "COUNTRY_NAME"));
-		countryDo.setCAPITAL(getStringValue(map, "CAPITAL"));
-		countryDo.setEU(getIntValue(map, "EU"));
-		countryDo.setSUBREGION_ID(getIntValue(map, "SUBREGION_ID"));
-		countryDo.setLCC(getIntValue(map, "LCC"));
-		countryDo.setEMERGING_MARKET(getIntValue(map, "EMERGING_MARKET"));
-		return countryDo;
+	private Object toQuestionMarkList(String[] columnNames) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String str : columnNames) {
+			if (!first) sb.append(",");
+			sb.append("?");
+			first = false;
+		}
+		return sb.toString();
 	}
 
-	private List<CountryDo> mapCountryDo(List<Map<String, Object>> rows) {
-		List<CountryDo> list = new ArrayList<CountryDo>();
+	private Object toUpdateSetList(String[] columnNames) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for (String fieldName : columnNames) {
+			if (!first) sb.append(",");
+			sb.append(fieldName + "=?");
+			first = false;
+		}
+		return sb.toString();
+	}
+
+	private Object[] toArgumentAry(T t, String[] columnNames) {
+		List<Object> list = new ArrayList<Object>();
+		for (String fieldName : columnNames) {
+			list.add(marshal.getValue(t, fieldName));
+		}
+		return list.toArray();
+	}
+
+	abstract protected T map(Map<String, Object> map);
+
+	private List<T> map(List<Map<String, Object>> rows) {
+		List<T> list = new ArrayList<T>();
 		for (Map<String, Object> row : rows) {
-			CountryDo countryDo = mapCountryDo(row);
-			if (countryDo != null)
-				list.add(countryDo);
+			T t = map(row);
+			if (t != null) list.add(t);
 		}
 		return list;
 	}
 
-	private static String getStringValue(Map<String, Object> map, String key) {
+	public static String getStringValue(Map<String, Object> map, String key) {
 		Object o = map.get(key);
 		return (o == null) ? null : o.toString();
 	}
 
-	private static long getLongValue(Map<String, Object> map, String key) {
+	public static long getLongValue(Map<String, Object> map, String key) {
 		Object o = map.get(key);
 		return (o == null) ? null : ((Number) o).longValue();
 	}
 
-	private static int getIntValue(Map<String, Object> map, String key) {
+	public static int getIntValue(Map<String, Object> map, String key) {
 		Object o = map.get(key);
 		return (o == null) ? null : ((Number) o).intValue();
 	}
 
-	public void remove(String countryId) {
-		String sql = "DELETE FROM EMEA_ODS.ODS.REF_COUNTRY WHERE COUNTRY_ID=?";
-		Object[] args = new Object[] { countryId };
+	public T get(String id) {
+		String sql = String.format("SELECT %s FROM %s.%s WHERE %s=?", toCommaList(columnsForListView), databaseName, tableName,
+				columnKey);
+		Object[] args = new Object[] { id };
+		Map<String, Object> row = jdbcTemplate.queryForMap(sql, args);
+		return map(row);
+	}
+
+	public void remove(String id) {
+		String sql = String.format("DELETE FROM %s.%s WHERE %s=?", databaseName, tableName, columnKey);
+		Object[] args = new Object[] { id };
 		jdbcTemplate.update(sql, args);
 	}
 
-	public void putNew(CountryDo countryDo) {
-		String sql = "insert into EMEA_ODS.ODS.REF_COUNTRY (" + columnNames
-				+ ") values(?,?,?,?,?,?,?,?)";
-		jdbcTemplate.update(sql, argsInsert(countryDo));
+	public void putNew(T t) {
+		String sql = String.format("insert into %s.%s (%s) values(%s)", databaseName, tableName,
+				toCommaList(columnsForAddingNewRows), toQuestionMarkList(columnsForAddingNewRows));
+		jdbcTemplate.update(sql, toArgumentAry(t, columnsForAddingNewRows));
 	}
 
-	private Object[] argsInsert(CountryDo countryDo) {
-		Object[] args = new Object[] { countryDo.getCOUNTRY_ID(),
-				countryDo.getCOUNTRY_KEY(), countryDo.getCOUNTRY_NAME(),
-				countryDo.getCAPITAL(), countryDo.getEU(),
-				countryDo.getSUBREGION_ID(), countryDo.getLCC(),
-				countryDo.getEMERGING_MARKET() };
-		return args;
+	public void putExisting(T t) {
+		String sql = String.format("UPDATE %s.%s set %s WHERE %s=?", databaseName, tableName,
+				toUpdateSetList(columnsForRowModifications), columnKey);
+		logger.info("putExisting() T: " + t.toString());
+		logger.info("putExisting() SQL: " + sql);
+		jdbcTemplate.update(sql, toArgumentAry(t, concat(columnsForRowModifications, new String[]{columnKey})));
 	}
 
-	private Object[] argsUpdate(CountryDo countryDo) {
-		Object[] args = new Object[] { countryDo.getCOUNTRY_ID(),
-				countryDo.getCOUNTRY_KEY(), countryDo.getCOUNTRY_NAME(),
-				countryDo.getCAPITAL(), countryDo.getEU(),
-				countryDo.getSUBREGION_ID(), countryDo.getLCC(),
-				countryDo.getEMERGING_MARKET() };
-		return args;
+	private String[] concat(String[] a, String[] b) {
+		int aLen = a.length;
+		int bLen = b.length;
+		String[] c = new String[aLen + bLen];
+		System.arraycopy(a, 0, c, 0, aLen);
+		System.arraycopy(b, 0, c, aLen, bLen);
+		return c;
 	}
 
-	public void putExisting(CountryDo countryDo) {
-		String sql = "UPDATE EMEA_ODS.ODS.REF_COUNTRY set COUNTRY_KEY=?,COUNTRY_NAME=?,CAPITAL,EU=?,SUBREGION_ID=?,LCC=?,EMERGING_MARKET=?"
-				+ "WHERE COUNTRY_ID=?";
-		jdbcTemplate.update(sql, argsUpdate(countryDo));
-	}
-
-	public List<CountryDo> find() {
-		String sql = "SELECT " + columnNames
-				+ " FROM EMEA_ODS.ODS.REF_COUNTRY ORDER BY COUNTRY_NAME";
-		logger.info("find()");
+	public List<T> find() {
+		String sql = String.format("SELECT %s FROM %s.%s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName,
+				columnKey);
+		logger.info("find() SQL: " + sql);
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
-		return mapCountryDo(rows);
+		return map(rows);
 	}
 
-	public List<CountryDo> find(CountryDo match) {
+	public List<T> find(T match) {
 		logger.info("find(match) " + match.toString());
 		Map<String, ?> map = marshal.toMap(match);
 		List<Object> argList = new ArrayList<Object>();
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
-		for (String key : columnSearchAry) {
+		for (String key : columnsForSearchFilter) {
 			Object value = map.get(key);
-			if (value != null && !value.toString().trim().isEmpty()) {
-				sb.append(String.format(" %s %s = ?", first ? "where " : "and ",
-						key));
+			if (value != null && !value.toString().trim().isEmpty() && !value.toString().trim().equals("0")) {
+				sb.append(String.format(" %s %s = ?", first ? "where " : "and ", key));
 				argList.add(value);
 				first = false;
 			}
 		}
 		Object[] args = argList.toArray();
-		String sql = String.format("SELECT %s FROM EMEA_ODS.ODS.REF_COUNTRY %s ORDER BY COUNTRY_NAME", columnNames, sb.toString());
+		String sql = String.format("SELECT %s FROM %s.%s %s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName,
+				sb.toString(), columnKey);
 		logger.info("find(match) SQL: " + sql);
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
-		return mapCountryDo(rows);
+		return map(rows);
 	}
 
 }

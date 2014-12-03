@@ -33,8 +33,8 @@ public class CountryRest {
 	private static final String DeleteUri = "/delete/{COUNTRY_ID}";
 	private static final String BaseUri = "/fyfaSamples/service/rest/country";
 	private final Context context = new Context();
-	private final Dao dao;
-	private final ViewFactory viewFactory;
+	private final CountryDao dao;
+	private final ViewFactory<CountryDo> viewFactory;
 	private final RenderingEngine renderingEngine;
 	private final Form<CountryDo> formModify;
 	private final Form<CountryDo> formNew;
@@ -42,10 +42,12 @@ public class CountryRest {
 	private final Form<CountryDo> formView;
 	private final Table<CountryDo> tableList;
 
-	public CountryRest( RenderingEngine renderingEngine, JdbcTemplate jdbcTemplate ) {
+	public CountryRest( RenderingEngine renderingEngine, JdbcTemplate jdbcTemplate ) throws Exception {
 		this.renderingEngine = renderingEngine;
-		this.dao = new Dao(jdbcTemplate);
-		viewFactory = new ViewFactory( this.context, newPathSetting() );
+		DaoParams params = DaoParams.assign(new CountryDo(),"EMEA_ODS", "ODS.REF_COUNTRY", "COUNTRY_ID");
+		//params.setColumnsForRowModifications(new String[]{"CAPITAL","COUNTRY_NAME"});
+		this.dao = new CountryDao(jdbcTemplate, params );
+		viewFactory = new ViewFactory<CountryDo>(CountryDo.class, this.context, newPathSetting(), params );
 		formModify = viewFactory.createFormForRowModifications();
 		formNew = viewFactory.createFormForAddingNewRows();
 		formSearch = viewFactory.createFormForSearchFilter();
