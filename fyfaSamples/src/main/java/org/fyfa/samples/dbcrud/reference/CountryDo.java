@@ -1,12 +1,13 @@
-package org.fyfa.samples.dbcrud;
+package org.fyfa.samples.dbcrud.reference;
 
 import org.fyfa.annotations.FieldDef;
 import org.fyfa.annotations.ItemDefFormModify;
 import org.fyfa.annotations.ItemDefFormNew;
 import org.fyfa.annotations.ItemDefTable;
+import org.fyfa.samples.dbcrud.DomainObject;
 
-public class CountryDo {
-	private final String edit = "", delete = "", view = "";
+public class CountryDo implements DomainObject {
+	final String edit = "", delete = "", view = "";
 
 	@ItemDefFormModify(readOnly = true)
 	@ItemDefFormNew(required = true)
@@ -30,15 +31,6 @@ public class CountryDo {
 	private int LCC;
 	@FieldDef(label= "Emerging Market")
 	private int EMERGING_MARKET;
-
-//	public CountryDo() {
-//	}
-//	
-//	public CountryDo(String countryId, int countryKey, String countryName) {
-//		this.COUNTRY_ID = countryId;
-//		this.COUNTRY_KEY = countryKey;
-//		this.COUNTRY_NAME = countryName;
-//	}
 
 	public String getCOUNTRY_ID() {
 		return COUNTRY_ID;
@@ -106,25 +98,27 @@ public class CountryDo {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("CountryDo [COUNTRY_ID=");
-		builder.append(COUNTRY_ID);
-		builder.append(", COUNTRY_KEY=");
-		builder.append(COUNTRY_KEY);
-		builder.append(", COUNTRY_NAME=");
-		builder.append(COUNTRY_NAME);
-		builder.append(", CAPITAL=");
-		builder.append(CAPITAL);
-		builder.append(", EU=");
-		builder.append(EU);
-		builder.append(", SUBREGION_ID=");
-		builder.append(SUBREGION_ID);
-		builder.append(", LCC=");
-		builder.append(LCC);
-		builder.append(", EMERGING_MARKET=");
-		builder.append(EMERGING_MARKET);
-		builder.append("]");
-		return builder.toString();
+		return String
+				.format("CountryDo [edit=%s, delete=%s, view=%s, COUNTRY_ID=%s, COUNTRY_KEY=%s, COUNTRY_NAME=%s, CAPITAL=%s, EU=%s, SUBREGION_ID=%s, LCC=%s, EMERGING_MARKET=%s]",
+						edit, delete, view, COUNTRY_ID, COUNTRY_KEY, COUNTRY_NAME, CAPITAL, EU, SUBREGION_ID, LCC, EMERGING_MARKET);
+	}
+
+	@Override
+	public void clear() {
+		COUNTRY_ID = null;
+		COUNTRY_KEY = 0;
+		COUNTRY_NAME = null;
+		CAPITAL = null;
+		EU = 0;
+		SUBREGION_ID = 0;
+		LCC = 0;
+		EMERGING_MARKET = 0;
+	}
+
+
+	@Override
+	public Class<? extends DomainObject> clazz() {
+		return CountryDo.class;
 	}
 
 }

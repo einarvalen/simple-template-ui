@@ -100,6 +100,11 @@ abstract public class Dao<T> {
 		return (o == null) ? null : ((Number) o).longValue();
 	}
 
+	public static Double getDoubleValue(Map<String, Object> map, String key) {
+		Object o = map.get(key);
+		return (o == null) ? null : ((Number) o).doubleValue();
+	}
+	
 	public static int getIntValue(Map<String, Object> map, String key) {
 		Object o = map.get(key);
 		return (o == null) ? null : ((Number) o).intValue();
@@ -108,7 +113,9 @@ abstract public class Dao<T> {
 	public T get(String id) {
 		String sql = String.format("SELECT %s FROM %s.%s WHERE %s=?", toCommaList(columnsForListView), databaseName, tableName,
 				columnKey);
-		Object[] args = new Object[] { id };
+		Object[] args = new Object[] { id.trim() };
+		logger.info("get() SQL: " + sql);
+		logger.info("get() ID: " + id);
 		Map<String, Object> row = jdbcTemplate.queryForMap(sql, args);
 		return map(row);
 	}

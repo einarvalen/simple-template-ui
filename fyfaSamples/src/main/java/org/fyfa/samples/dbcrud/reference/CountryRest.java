@@ -1,4 +1,4 @@
-package org.fyfa.samples.dbcrud;
+package org.fyfa.samples.dbcrud.reference;
 
 import java.util.List;
 
@@ -14,6 +14,10 @@ import org.fyfa.components.Form;
 import org.fyfa.components.ParseException;
 import org.fyfa.components.Table;
 import org.fyfa.samples.RenderingEngine;
+import org.fyfa.samples.dbcrud.DaoParams;
+import org.fyfa.samples.dbcrud.PathSetting;
+import org.fyfa.samples.dbcrud.Service;
+import org.fyfa.samples.dbcrud.ViewFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /** Link is a CRUD show-case.
@@ -21,7 +25,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author EinarValen@gmail.com */
 @Path("/country")
 public class CountryRest {
-	private static final String QuitUri = "/fyfaSamples";
 	private static final String TableUri = "/table";
 	private static final String ModifyFormUri = "/form/modify/{COUNTRY_ID}";
 	private static final String ModifyUri = "/modify";
@@ -33,26 +36,12 @@ public class CountryRest {
 	private static final String DeleteUri = "/delete/{COUNTRY_ID}";
 	private static final String BaseUri = "/fyfaSamples/service/rest/country";
 	private final Context context = new Context();
-	private final CountryDao dao;
-	private final ViewFactory<CountryDo> viewFactory;
-	private final RenderingEngine renderingEngine;
-	private final Form<CountryDo> formModify;
-	private final Form<CountryDo> formNew;
-	private final Form<CountryDo> formSearch;
-	private final Form<CountryDo> formView;
-	private final Table<CountryDo> tableList;
+	private final Service<CountryDo> service;
 
 	public CountryRest( RenderingEngine renderingEngine, JdbcTemplate jdbcTemplate ) throws Exception {
-		this.renderingEngine = renderingEngine;
 		DaoParams params = DaoParams.assign(new CountryDo(),"EMEA_ODS", "ODS.REF_COUNTRY", "COUNTRY_ID");
-		//params.setColumnsForRowModifications(new String[]{"CAPITAL","COUNTRY_NAME"});
-		this.dao = new CountryDao(jdbcTemplate, params );
-		viewFactory = new ViewFactory<CountryDo>(CountryDo.class, this.context, newPathSetting(), params );
-		formModify = viewFactory.createFormForRowModifications();
-		formNew = viewFactory.createFormForAddingNewRows();
-		formSearch = viewFactory.createFormForSearchFilter();
-		formView = viewFactory.createFormForViewingRow();
-		tableList = viewFactory.createTableForViewingRows();
+		ViewFactory<CountryDo> viewFactory = new ViewFactory<CountryDo>(CountryDo.class, this.context, newPathSetting(), params );
+		this.service = new Service<CountryDo>( context, renderingEngine, viewFactory, new CountryDao(jdbcTemplate, params ));
 	}
 
 	private PathSetting newPathSetting() {
@@ -69,35 +58,12 @@ public class CountryRest {
 		return pathSetting;
 	}
 
-	private String render( Form<CountryDo> form, CountryDo countryDo ) {
-		String html = form.render( countryDo );
-		return this.renderingEngine.render( html, form.getTitle() );
-	}
-
-	private String renderWithErrors( Form<CountryDo> form, CountryDo countryDo, ParseException e ) {
-		String html = form.render( countryDo, e );
-		return this.renderingEngine.render( html, form.getTitle() );
-	}
-
-	private String render( Table<CountryDo> table, List<CountryDo> list ) {
-		String html = table.render( list );
-		return this.renderingEngine.render( html, table.getTitle() );
-	}
-
-	private CountryDo parse( Form<CountryDo> form, MultivaluedMap<String, String> multivaluedMap ) throws ParseException {
-		return form.parse( this.renderingEngine.toMap( multivaluedMap ), new CountryDo() );
-	}
-
 	/** Renders formModify - extracts a CountryDo object from the database based on COUNTRY_ID. Then renders the object in a form ready for the user to alter the field values of choice  */
 	@GET
 	@Path(ModifyFormUri)
 	@Produces("text/html")
-	public String formModify( @PathParam("COUNTRY_ID") String COUNTRY_ID ) {
-		try {
-			return render( formModify, dao.get( COUNTRY_ID ) );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+	public String formModify( @PathParam("COUNTRY_ID") String key ) {
+		return this.service.formModify( key );
 	}
 
 	/** Parses user input submitted from formModify and updates the actual data in the database. Then renders the tableList ready for more user interaction */
@@ -105,16 +71,7 @@ public class CountryRest {
 	@Path(ModifyUri)
 	@Produces("text/html")
 	public String modify( MultivaluedMap<String, String> multivaluedMap ) {
-		CountryDo countryDo = null;
-		try {
-			countryDo = parse( formModify, multivaluedMap );
-			dao.putExisting( countryDo );
-			return render( tableList, dao.find() );
-		} catch (ParseException e) {
-			return renderWithErrors( formModify, countryDo, e );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.modify(multivaluedMap, new CountryDo() );
 	}
 
 	/** Renders formSearch - a form to accept data to issue a database search for existing CountryDo objects  */
@@ -122,11 +79,7 @@ public class CountryRest {
 	@Path(SearchFormUri)
 	@Produces("text/html")
 	public String formSearch() {
-		try {
-			return render( formSearch, new CountryDo() );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.formSearch(new CountryDo());
 	}
 
 	/** Parses user input submitted from formSearch performs a search from the database. Then renders the extracted list of CountryDo objects in tableList */
@@ -134,27 +87,15 @@ public class CountryRest {
 	@Path(SearchUri)
 	@Produces("text/html")
 	public String search( MultivaluedMap<String, String> multivaluedMap ) {
-		CountryDo countryDo = null;
-		try {
-			countryDo = parse( formSearch, multivaluedMap );
-			return render( tableList, dao.find( countryDo ) );
-		} catch (ParseException e) {
-			return renderWithErrors( formSearch, countryDo, e );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.search(multivaluedMap, new CountryDo() );
 	}
 
 	/** Renders formView - a read only view of one existing CountryDo object */
 	@GET
 	@Path(ViewFormUri)
 	@Produces("text/html")
-	public String formView( @PathParam("COUNTRY_ID") String COUNTRY_ID ) {
-		try {
-			return render( formView, dao.get( COUNTRY_ID ) );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+	public String formView( @PathParam("COUNTRY_ID") String key ) {
+		return this.service.formView(key);
 	}
 
 	/** Renders formNew - a form to accept data for new CountryDo objects  */
@@ -162,11 +103,7 @@ public class CountryRest {
 	@Path(NewFormUri)
 	@Produces("text/html")
 	public String formNew() {
-		try {
-			return render( formNew, new CountryDo() );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.formNew(new CountryDo() );
 	}
 
 	/** Parses user input submitted from formNew and inserts the data in the database. Then renders the newForm ready for more user input  */
@@ -174,29 +111,15 @@ public class CountryRest {
 	@Path(NewUri)
 	@Produces("text/html")
 	public String create( MultivaluedMap<String, String> multivaluedMap ) {
-		CountryDo countryDo = null;
-		try {
-			countryDo = parse( formNew, multivaluedMap );
-			dao.putNew( countryDo );
-			return render( formNew, new CountryDo() );
-		} catch (ParseException e) {
-			return renderWithErrors( formNew, countryDo, e );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.create(multivaluedMap, new CountryDo() );
 	}
 
 	/** Executes the remove from database and renders the table view  */
 	@GET
 	@Path(DeleteUri)
 	@Produces("text/html")
-	public String delete( @PathParam("COUNTRY_ID") String COUNTRY_ID ) {
-		try {
-			dao.remove( COUNTRY_ID );
-			return render( tableList, dao.find() );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+	public String delete( @PathParam("COUNTRY_ID") String key ) {
+		return this.service.delete(key);
 	}
 
 	/** Renders the table view of a list of CountryDo objects  */
@@ -204,11 +127,7 @@ public class CountryRest {
 	@Path(TableUri)
 	@Produces("text/html")
 	public String table() {
-		try {
-			return render( tableList, dao.find() );
-		} catch (Exception e) {
-			throw this.renderingEngine.handleExceptionHtml( e );
-		}
+		return this.service.table();
 	}
 
 	/** Downloads the Context */
