@@ -40,12 +40,12 @@ public class RenderingEngine {
 			Map<String, String> model = new HashMap<String, String>();
 			model.put( "menu", menu );
 			model.put( "title", title );
-			model.put( "content", (content == null || content.trim().length() == 0) ? "<h3>Ingen ting å vise!</h3>" : content );
+			model.put( "content", (content == null || content.trim().length() == 0) ? "<h3>Nothing to show!</h3>" : content );
 			String result = VelocityEngineUtils.mergeTemplateIntoString( this.velocityEngine, "thePage.html", "UTF-8", model );
 			return result;
 		} catch (Exception e) {
 			logger.error( "Rendering engine has problems", e );
-			return "Teknisk feil! Venligst meld fra til teknisk support! " + e.getMessage();
+			return "There was a problem. Please try again later." + e.getMessage();
 		}
 	}
 
