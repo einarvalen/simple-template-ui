@@ -36,6 +36,13 @@ abstract public class Dao<T> {
 		this.columnsForListView = params.getColumnsForListView();
 		this.tableName = params.getTableName();
 		this.databaseName = params.getDatabaseName();
+		init();
+	}
+
+	protected void init() {}
+
+	public void execute(String sql) {
+		jdbcTemplate.update(sql);
 	}
 
 	private Object toCommaList(String[] columnNames) {
@@ -104,15 +111,15 @@ abstract public class Dao<T> {
 		Object o = map.get(key);
 		return (o == null) ? null : ((Number) o).doubleValue();
 	}
-	
+
 	public static int getIntValue(Map<String, Object> map, String key) {
 		Object o = map.get(key);
 		return (o == null) ? null : ((Number) o).intValue();
 	}
 
 	public T get(String id) {
-		String sql = String.format("SELECT %s FROM %s.%s WHERE %s=?", toCommaList(columnsForListView), databaseName, tableName,
-				columnKey);
+		//String sql = String.format("SELECT %s FROM %s.%s WHERE %s=?", toCommaList(columnsForListView), databaseName, tableName, columnKey);
+		String sql = String.format("SELECT %s FROM %s WHERE %s=?", toCommaList(columnsForListView), tableName, columnKey);
 		Object[] args = new Object[] { id.trim() };
 		logger.info("get() SQL: " + sql);
 		logger.info("get() ID: " + id);
@@ -121,23 +128,25 @@ abstract public class Dao<T> {
 	}
 
 	public void remove(String id) {
-		String sql = String.format("DELETE FROM %s.%s WHERE %s=?", databaseName, tableName, columnKey);
+		//String sql = String.format("DELETE FROM %s.%s WHERE %s=?", databaseName, tableName, columnKey);
+		String sql = String.format("DELETE FROM %s WHERE %s=?", tableName, columnKey);
 		Object[] args = new Object[] { id };
 		jdbcTemplate.update(sql, args);
 	}
 
 	public void putNew(T t) {
-		String sql = String.format("insert into %s.%s (%s) values(%s)", databaseName, tableName,
+		//String sql = String.format("insert into %s.%s (%s) values(%s)", databaseName, tableName,
+		String sql = String.format("insert into %s (%s) values(%s)", tableName,
 				toCommaList(columnsForAddingNewRows), toQuestionMarkList(columnsForAddingNewRows));
 		jdbcTemplate.update(sql, toArgumentAry(t, columnsForAddingNewRows));
 	}
 
 	public void putExisting(T t) {
-		String sql = String.format("UPDATE %s.%s set %s WHERE %s=?", databaseName, tableName,
-				toUpdateSetList(columnsForRowModifications), columnKey);
+		//String sql = String.format("UPDATE %s.%s set %s WHERE %s=?", databaseName, tableName, toUpdateSetList(columnsForRowModifications), columnKey);
+		String sql = String.format("UPDATE %s set %s WHERE %s=?", tableName, toUpdateSetList(columnsForRowModifications), columnKey);
 		logger.info("putExisting() T: " + t.toString());
 		logger.info("putExisting() SQL: " + sql);
-		jdbcTemplate.update(sql, toArgumentAry(t, concat(columnsForRowModifications, new String[]{columnKey})));
+		jdbcTemplate.update(sql, toArgumentAry(t, concat(columnsForRowModifications, new String[] { columnKey })));
 	}
 
 	private String[] concat(String[] a, String[] b) {
@@ -150,8 +159,8 @@ abstract public class Dao<T> {
 	}
 
 	public List<T> find() {
-		String sql = String.format("SELECT %s FROM %s.%s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName,
-				columnKey);
+		//String sql = String.format("SELECT %s FROM %s.%s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName, columnKey);
+		String sql = String.format("SELECT %s FROM %s ORDER BY %s", toCommaList(columnsForListView), tableName, columnKey);
 		logger.info("find() SQL: " + sql);
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 		return map(rows);
@@ -166,14 +175,14 @@ abstract public class Dao<T> {
 		for (String key : columnsForSearchFilter) {
 			Object value = map.get(key);
 			if (value != null && !value.toString().trim().isEmpty() && !value.toString().trim().equals("0")) {
-				sb.append(String.format(" %s %s = ?", first ? "where " : "and ", key));
+				sb.append(String.format(" %s %s like (?)", first ? "where " : "and ", key));
 				argList.add(value);
 				first = false;
 			}
 		}
 		Object[] args = argList.toArray();
-		String sql = String.format("SELECT %s FROM %s.%s %s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName,
-				sb.toString(), columnKey);
+//		String sql = String.format("SELECT %s FROM %s.%s %s ORDER BY %s", toCommaList(columnsForListView), databaseName, tableName, sb.toString(), columnKey);
+		String sql = String.format("SELECT %s FROM %s %s ORDER BY %s", toCommaList(columnsForListView), tableName, sb.toString(), columnKey);
 		logger.info("find(match) SQL: " + sql);
 		List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, args);
 		return map(rows);

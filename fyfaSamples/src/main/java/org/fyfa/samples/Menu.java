@@ -16,10 +16,7 @@ public class Menu {
 		this.menuPanel.add( "Validator", "See ValidatorRest.java", "/fyfaSamples/service/rest/validator/form" );
 		this.menuPanel.add( "Spring", "See SpringRest.java and springContext.java", "/fyfaSamples/service/rest/spring/form" );
 		this.menuPanel.add( "Links", "See samples.link package", "/fyfaSamples/service/rest/link/table" );
-		this.menuPanel.add( "                       ", "", "" );
-		this.menuPanel.add( "Sbu", "See samples.dbcrud package", "/fyfaSamples/service/rest/sbu/table" );
-		this.menuPanel.add( "Country", "See samples.dbcrud package", "/fyfaSamples/service/rest/country/table" );
-		this.menuPanel.add( "ExchangeRates", "See samples.dbcrud package", "/fyfaSamples/service/rest/currencyexchangerate/table" );
+		this.menuPanel.add( "DbCrud", "See samples.dbcrud package", "/fyfaSamples/service/rest/dbcrud/link/table" );
 	}
 
 	public String render() {

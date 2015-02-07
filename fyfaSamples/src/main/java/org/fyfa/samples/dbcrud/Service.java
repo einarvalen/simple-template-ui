@@ -14,6 +14,8 @@ import org.fyfa.components.Form;
 import org.fyfa.components.ParseException;
 import org.fyfa.components.Table;
 import org.fyfa.samples.RenderingEngine;
+import org.fyfa.samples.dbcrud.link.LinkDao;
+import org.fyfa.samples.dbcrud.link.LinkDo;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /** 
@@ -37,7 +39,7 @@ public class Service<T extends DomainObject> {
 		tableList = viewFactory.createTableForViewingRows();
 	}
 
-	private String render( Form<T> form,  T t ) {
+		private String render( Form<T> form,  T t ) {
 		String html = form.render( t );
 		return this.renderingEngine.render( html, form.getTitle() );
 	}

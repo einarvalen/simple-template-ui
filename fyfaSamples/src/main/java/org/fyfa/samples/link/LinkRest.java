@@ -145,9 +145,9 @@ public class LinkRest {
 	@GET
 	@Path(ViewFormUri)
 	@Produces("text/html")
-	public String formView( @PathParam("ssn") String ssn ) {
+	public String formView( @PathParam("ssn") String key ) {
 		try {
-			return render( formView, dao.get( ssn ) );
+			return render( formView, dao.get( key ) );
 		} catch (Exception e) {
 			throw this.renderingEngine.handleExceptionHtml( e );
 		}

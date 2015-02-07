@@ -56,15 +56,7 @@
 			<bean class="org.fyfa.samples.link.LinkRest">
 				<constructor-arg ref="renderingEngine" />
 			</bean>
-			<bean class="org.fyfa.samples.dbcrud.reference.SbuRest">
-				<constructor-arg index="0" ref="renderingEngine" />
-				<constructor-arg index="1" ref="jdbcTemplate" />
-			</bean>
-			<bean class="org.fyfa.samples.dbcrud.reference.CountryRest">
-				<constructor-arg index="0" ref="renderingEngine" />
-				<constructor-arg index="1" ref="jdbcTemplate" />
-			</bean>
-			<bean class="org.fyfa.samples.dbcrud.reference.CurrencyExchangeRateRest">
+			<bean class="org.fyfa.samples.dbcrud.link.LinkRest">
 				<constructor-arg index="0" ref="renderingEngine" />
 				<constructor-arg index="1" ref="jdbcTemplate" />
 			</bean>
