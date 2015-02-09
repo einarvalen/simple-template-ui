@@ -9,7 +9,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.fyfa.Context;
 import org.fyfa.samples.RenderingEngine;
-import org.fyfa.samples.dbcrud.DaoParams;
 import org.fyfa.samples.dbcrud.PathSetting;
 import org.fyfa.samples.dbcrud.Service;
 import org.fyfa.samples.dbcrud.ViewFactory;
@@ -34,9 +33,9 @@ public class LinkRest {
 	private final Service<LinkDo> service;
 
 	public LinkRest( RenderingEngine renderingEngine, JdbcTemplate jdbcTemplate ) throws Exception {
-		DaoParams params = DaoParams.assign(new LinkDo(),"DBCRUD", "LINK", "ssn");
-		ViewFactory<LinkDo> viewFactory = new ViewFactory<LinkDo>(LinkDo.class, this.context, newPathSetting(), params );
-		this.service = new Service<LinkDo>( context, renderingEngine, viewFactory, new LinkDao(jdbcTemplate, params ));
+		LinkDao dao = new LinkDao(jdbcTemplate);
+		ViewFactory<LinkDo> viewFactory = new ViewFactory<LinkDo>(LinkDo.class, this.context, newPathSetting(), dao );
+		this.service = new Service<LinkDo>( context, renderingEngine, viewFactory, dao);
 	}
 
 	private PathSetting newPathSetting() {
